@@ -1,6 +1,6 @@
 import type { Everything, Value } from "./basic.ts";
 
-// | 𝑥            = | any            | unknown        | Everything¹    | never          | void           | null           | undefined      | Value²         | {}             | object         | Unconstrained³ |
+// | 𝑥   =/extends⁰ | any            | unknown        | Everything¹    | never          | void           | null           | undefined      | Value²         | {}             | object         | Unconstrained³ |
 // | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- |
 // | any            | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              |
 // | unknown        | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              |
@@ -12,8 +12,9 @@ import type { Everything, Value } from "./basic.ts";
 // | Value²         | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              |
 // | {}             | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✔              | ✔              | ✔              | ✘              |
 // | object         | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              | ✔              | ✔              | ✘              |
-// | Unconstrained³ | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              |
+// | Unconstrained³ | ✔/✘            | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              |
 //
+// ⁰ 𝑥/𝑦 used to display inconsistency between assignment and `extends` behavior.
 // ¹ `{} | null | undefined` that mirrors `unknown` behavior.
 // ² Non-nullable primitives: `string`, `number`, `boolean`, `symbol`, `bigint`.
 // ³ Unconstained type parameter i.e. `T` in `function<T>(arg: T)`.
@@ -65,6 +66,41 @@ let object = {} as object;
       object = any;
       <Unconstrained>(unconstrained: Unconstrained) => {
         unconstrained = any;
+      };
+    }
+
+    // `any` extends everything.
+    {
+      tyst<any extends any ? 1 : 0>(1);
+      tyst<any extends unknown ? 1 : 0>(1);
+      tyst<any extends Everything ? 1 : 0>(1);
+      tyst<any extends never ? 1 : 0>(1);
+      tyst<any extends void ? 1 : 0>(1);
+      tyst<any extends null ? 1 : 0>(1);
+      tyst<any extends undefined ? 1 : 0>(1);
+      tyst<any extends Value ? 1 : 0>(1);
+      tyst<any extends {} ? 1 : 0>(1);
+      tyst<any extends object ? 1 : 0>(1);
+      <Unconstrained>(unconstrained: Unconstrained) => {
+        tyst<any extends Unconstrained ? 1 : 0>(1);
+      };
+    }
+
+    // Everything extends `any` except unconstrained type.
+    {
+      tyst<any extends any ? 1 : 0>(1);
+      tyst<unknown extends any ? 1 : 0>(1);
+      tyst<Everything extends any ? 1 : 0>(1);
+      tyst<never extends any ? 1 : 0>(1);
+      tyst<void extends any ? 1 : 0>(1);
+      tyst<null extends any ? 1 : 0>(1);
+      tyst<undefined extends any ? 1 : 0>(1);
+      tyst<Value extends any ? 1 : 0>(1);
+      tyst<{} extends any ? 1 : 0>(1);
+      tyst<object extends any ? 1 : 0>(1);
+      <Unconstrained>(unconstrained: Unconstrained) => {
+        // @ts-expect-error
+        tyst<Unconstrained extends any ? 1 : 0>(1);
       };
     }
   }
@@ -600,3 +636,5 @@ let object = {} as object;
   //#endregion
 }
 //#endregion
+
+function tyst<Type>(_: Type): void {}
