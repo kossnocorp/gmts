@@ -8,13 +8,13 @@ import type { Everything, Value } from "./basic.ts";
 // | never          | ✘              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              |
 // | void           | ✔              | ✘              | ✘              | ✔              | ✔              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              |
 // | null           | ✔              | ✘              | ✘              | ✔              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              | ✘              |
-// | undefined      | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              |
+// | undefined      | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              |
 // | Value²         | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              |
 // | {}             | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✔              | ✔              | ✔              | ✘              |
 // | object         | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              | ✔              | ✔              | ✘              |
 // | Unconstrained³ | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              |
 //
-// ¹ `{} | null | undefined` that behaves similar to `unknown`.
+// ¹ `{} | null | undefined` that mirrors `unknown` behavior.
 // ² Non-nullable primitives: `string`, `number`, `boolean`, `symbol`, `bigint`.
 // ³ Unconstained type parameter i.e. `T` in `function<T>(arg: T)`.
 
