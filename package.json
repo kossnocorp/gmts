@@ -1,0 +1,7 @@
+{
+  "name": "gmts",
+  "version": "0.0.0",
+  "description": "Library of grandmaster-level TypeScript utility types",
+  "author": "Sasha Koss <koss@nocorp.me>",
+  "license": "MIT"
+}
