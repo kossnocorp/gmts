@@ -16,7 +16,7 @@ let object = {} as object;
 // | 𝑥            = | any            | unknown        | Everything¹    | never          | void           | null           | undefined      | Value²         | {}             | object         | Unconstrained³ |
 // | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- |
 // | any            | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              |
-// | unknown        | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔             |
+// | unknown        | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              |
 // | Everything¹    | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              |
 // | never          | ✘              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              |
 // | void           | ✔              | ✘              | ✘              | ✔              | ✔              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              |
@@ -25,11 +25,12 @@ let object = {} as object;
 // | Value²         | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              |
 // | {}             | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✔              | ✔              | ✔              | ✘              |
 // | object         | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              | ✔              | ✔              | ✘              |
-// | Unconstrained³ | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              |
+// | Unconstrained³ | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              | ✔/✘            |
 //
 // ¹ `{} | null | undefined` that mirrors `unknown` behavior.
 // ² Non-nullable primitives: `string`, `number`, `boolean`, `symbol`, `bigint`.
-// ³ Unconstained type parameter i.e. `T` in `function<T>(arg: T)`.
+// ³ Unconstrained type parameter i.e. `T` in `function<T>(arg: T)`.
+// ⁴ Unconstrained type can be assigned to itself but not another unconstrained type.
 
 //#region Top types
 {
@@ -592,6 +593,7 @@ let object = {} as object;
         nonnullish = unconstrained;
         // @ts-expect-error
         object = unconstrained;
+        unconstrained = unconstrained;
         <Another>(another: Another) => {
           // @ts-expect-error
           another = unconstrained;
@@ -612,18 +614,19 @@ let object = {} as object;
 // | any            | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              |
 // | unknown        | ✔              | ✔              | ✔              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              |
 // | Everything¹    | ✔              | ✔              | ✔              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              |
-// | never          | ✔              | ✔              | ✔              |                |                |                |                |                |                |                |                |
-// | void           | ✔              | ✔              | ✔              |                |                |                |                |                |                |                |                |
-// | null           | ✔              | ✔              | ✔              |                |                |                |                |                |                |                |                |
-// | undefined      | ✔              | ✔              | ✔              |                |                |                |                |                |                |                |                |
-// | Value²         | ✔              | ✔              | ✔              |                |                |                |                |                |                |                |                |
-// | {}             | ✔              | ✔              | ✔              |                |                |                |                |                |                |                |                |
-// | object         | ✔              | ✔              | ✔              |                |                |                |                |                |                |                |                |
-// | Unconstrained³ | ✘              | ✘              | ✘              |                |                |                |                |                |                |                |                |
+// | never          | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              |
+// | void           | ✔              | ✔              | ✔              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              |
+// | null           | ✔              | ✔              | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              | ✘              |
+// | undefined      | ✔              | ✔              | ✔              | ✘              | ✔              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              |
+// | Value²         | ✔              | ✔              | ✔              | ✘              | ✘              | ✘              | ✘              | ✔              | ✔              | ✘              | ✘              |
+// | {}             | ✔              | ✔              | ✔              | ✘              | ✘              | ✘              | ✘              | ✘              | ✔              | ✔              | ✘              |
+// | object         | ✔              | ✔              | ✔              | ✘              | ✘              | ✘              | ✘              | ✘              | ✔              | ✔              | ✘              |
+// | Unconstrained³ | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘⁴             |
 //
 // ¹ `{} | null | undefined` that mirrors `unknown` behavior.
 // ² Non-nullable primitives: `string`, `number`, `boolean`, `symbol`, `bigint`.
-// ³ Unconstained type parameter i.e. `T` in `function<T>(arg: T)`.
+// ³ Unconstrained type parameter i.e. `T` in `function<T>(arg: T)`.
+// ⁴ Unconstrained type extends nothing including itself.
 
 //#region Top types
 {
@@ -817,36 +820,52 @@ let object = {} as object;
 {
   //#region void
   {
-    // TODO:
+    // `void` extends just `any`, `unknown`, everything type and itself.
     {
       tyst<void extends any ? 1 : 0>(1);
       tyst<void extends unknown ? 1 : 0>(1);
       tyst<void extends Everything ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<void extends never ? 1 : 0>(1);
       tyst<void extends void ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<void extends null ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<void extends undefined ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<void extends Value ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<void extends {} ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<void extends object ? 1 : 0>(1);
       <Unconstrained>(unconstrained: Unconstrained) => {
+        // @ts-expect-error
         tyst<void extends Unconstrained ? 1 : 0>(1);
       };
     }
 
-    // TODO:
+    // Only `any`, `never`, `undefined` and itself extends `void`.
     {
       tyst<any extends void ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<unknown extends void ? 1 : 0>(1);
+      // @ts-expect-error
+      tyst<unknown extends void ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<Everything extends void ? 1 : 0>(1);
       tyst<never extends void ? 1 : 0>(1);
       tyst<void extends void ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<null extends void ? 1 : 0>(1);
       tyst<undefined extends void ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<Value extends void ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<{} extends void ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<object extends void ? 1 : 0>(1);
       <Unconstrained>(unconstrained: Unconstrained) => {
+        // @ts-expect-error
         tyst<Unconstrained extends void ? 1 : 0>(1);
       };
     }
@@ -855,36 +874,51 @@ let object = {} as object;
 
   //#region null
   {
-    // TODO:
+    // `null` extends just `any`, `unknown`, everything type and itself.
     {
       tyst<null extends any ? 1 : 0>(1);
       tyst<null extends unknown ? 1 : 0>(1);
       tyst<null extends Everything ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<null extends never ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<null extends void ? 1 : 0>(1);
       tyst<null extends null ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<null extends undefined ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<null extends Value ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<null extends {} ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<null extends object ? 1 : 0>(1);
       <Unconstrained>(unconstrained: Unconstrained) => {
+        // @ts-expect-error
         tyst<null extends Unconstrained ? 1 : 0>(1);
       };
     }
 
-    // TODO:
+    // Just `any`, `never` and itself extends `null`.
     {
       tyst<any extends null ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<unknown extends null ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<Everything extends null ? 1 : 0>(1);
       tyst<never extends null ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<void extends null ? 1 : 0>(1);
       tyst<null extends null ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<undefined extends null ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<Value extends null ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<{} extends null ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<object extends null ? 1 : 0>(1);
       <Unconstrained>(unconstrained: Unconstrained) => {
+        // @ts-expect-error
         tyst<Unconstrained extends null ? 1 : 0>(1);
       };
     }
@@ -893,36 +927,50 @@ let object = {} as object;
 
   //#region undefined
   {
-    // TODO:
+    // `undefined` extends just `any`, `unknown`, everything type, `void` and itself.
     {
       tyst<undefined extends any ? 1 : 0>(1);
       tyst<undefined extends unknown ? 1 : 0>(1);
       tyst<undefined extends Everything ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<undefined extends never ? 1 : 0>(1);
       tyst<undefined extends void ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<undefined extends null ? 1 : 0>(1);
       tyst<undefined extends undefined ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<undefined extends Value ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<undefined extends {} ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<undefined extends object ? 1 : 0>(1);
       <Unconstrained>(unconstrained: Unconstrained) => {
+        // @ts-expect-error
         tyst<undefined extends Unconstrained ? 1 : 0>(1);
       };
     }
 
-    // TODO:
+    // Only `any`, `never` and itself extends `undefined`.
     {
       tyst<any extends undefined ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<unknown extends undefined ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<Everything extends undefined ? 1 : 0>(1);
       tyst<never extends undefined ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<void extends undefined ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<null extends undefined ? 1 : 0>(1);
       tyst<undefined extends undefined ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<Value extends undefined ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<{} extends undefined ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<object extends undefined ? 1 : 0>(1);
       <Unconstrained>(unconstrained: Unconstrained) => {
+        // @ts-expect-error
         tyst<Unconstrained extends undefined ? 1 : 0>(1);
       };
     }
@@ -935,36 +983,50 @@ let object = {} as object;
 {
   //#region Value
   {
-    // TODO:
+    // Non-nullable primitive types extend just `any`, `unknown`, everything type, `{}` and itself.
     {
       tyst<Value extends any ? 1 : 0>(1);
       tyst<Value extends unknown ? 1 : 0>(1);
       tyst<Value extends Everything ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<Value extends never ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<Value extends void ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<Value extends null ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<Value extends undefined ? 1 : 0>(1);
       tyst<Value extends Value ? 1 : 0>(1);
       tyst<Value extends {} ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<Value extends object ? 1 : 0>(1);
       <Unconstrained>(unconstrained: Unconstrained) => {
+        // @ts-expect-error
         tyst<Value extends Unconstrained ? 1 : 0>(1);
       };
     }
 
-    // TODO:
+    // Only `any`, `never` and itself extends value types.
     {
       tyst<any extends Value ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<unknown extends Value ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<Everything extends Value ? 1 : 0>(1);
       tyst<never extends Value ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<void extends Value ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<null extends Value ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<undefined extends Value ? 1 : 0>(1);
       tyst<Value extends Value ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<{} extends Value ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<object extends Value ? 1 : 0>(1);
       <Unconstrained>(unconstrained: Unconstrained) => {
+        // @ts-expect-error
         tyst<Unconstrained extends Value ? 1 : 0>(1);
       };
     }
@@ -977,36 +1039,48 @@ let object = {} as object;
 {
   //#region {}
   {
-    // TODO:
+    // `{}` extends just `any`, `unknown`, everything type, `object` and itself.
     {
       tyst<{} extends any ? 1 : 0>(1);
       tyst<{} extends unknown ? 1 : 0>(1);
       tyst<{} extends Everything ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<{} extends never ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<{} extends void ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<{} extends null ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<{} extends undefined ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<{} extends Value ? 1 : 0>(1);
       tyst<{} extends {} ? 1 : 0>(1);
       tyst<{} extends object ? 1 : 0>(1);
       <Unconstrained>(unconstrained: Unconstrained) => {
+        // @ts-expect-error
         tyst<{} extends Unconstrained ? 1 : 0>(1);
       };
     }
 
-    // TODO:
+    // Just `any`, `never`, value types, `object` and itself extends `{}`.
     {
       tyst<any extends {} ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<unknown extends {} ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<Everything extends {} ? 1 : 0>(1);
       tyst<never extends {} ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<void extends {} ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<null extends {} ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<undefined extends {} ? 1 : 0>(1);
       tyst<Value extends {} ? 1 : 0>(1);
       tyst<{} extends {} ? 1 : 0>(1);
       tyst<object extends {} ? 1 : 0>(1);
       <Unconstrained>(unconstrained: Unconstrained) => {
+        // @ts-expect-error
         tyst<Unconstrained extends {} ? 1 : 0>(1);
       };
     }
@@ -1015,36 +1089,49 @@ let object = {} as object;
 
   //#region object
   {
-    // TODO:
+    // `object extends just `any`, `unknown`, everything type, `{}` and itself.
     {
       tyst<object extends any ? 1 : 0>(1);
       tyst<object extends unknown ? 1 : 0>(1);
       tyst<object extends Everything ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<object extends never ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<object extends void ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<object extends null ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<object extends undefined ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<object extends Value ? 1 : 0>(1);
       tyst<object extends {} ? 1 : 0>(1);
       tyst<object extends object ? 1 : 0>(1);
       <Unconstrained>(unconstrained: Unconstrained) => {
+        // @ts-expect-error
         tyst<object extends Unconstrained ? 1 : 0>(1);
       };
     }
 
-    // TODO:
+    // Only `any`, `never`, value types, `{}` and itself extends `object`.
     {
       tyst<any extends object ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<unknown extends object ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<Everything extends object ? 1 : 0>(1);
       tyst<never extends object ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<void extends object ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<null extends object ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<undefined extends object ? 1 : 0>(1);
+      // @ts-expect-error
       tyst<Value extends object ? 1 : 0>(1);
       tyst<{} extends object ? 1 : 0>(1);
       tyst<object extends object ? 1 : 0>(1);
       <Unconstrained>(unconstrained: Unconstrained) => {
+        // @ts-expect-error
         tyst<Unconstrained extends object ? 1 : 0>(1);
       };
     }
@@ -1057,39 +1144,63 @@ let object = {} as object;
 {
   //#region Unconstrained type
   {
-    // TODO:
+    // Unconstrained type extends nothing including itself.
     {
       <Unconstrained>(unconstrained: Unconstrained) => {
+        // @ts-expect-error
         tyst<Unconstrained extends any ? 1 : 0>(1);
+        // @ts-expect-error
         tyst<Unconstrained extends unknown ? 1 : 0>(1);
+        // @ts-expect-error
         tyst<Unconstrained extends Everything ? 1 : 0>(1);
+        // @ts-expect-error
         tyst<Unconstrained extends never ? 1 : 0>(1);
+        // @ts-expect-error
         tyst<Unconstrained extends void ? 1 : 0>(1);
+        // @ts-expect-error
         tyst<Unconstrained extends null ? 1 : 0>(1);
+        // @ts-expect-error
         tyst<Unconstrained extends undefined ? 1 : 0>(1);
+        // @ts-expect-error
         tyst<Unconstrained extends Value ? 1 : 0>(1);
+        // @ts-expect-error
         tyst<Unconstrained extends {} ? 1 : 0>(1);
+        // @ts-expect-error
         tyst<Unconstrained extends object ? 1 : 0>(1);
+        // @ts-expect-error
+        tyst<Unconstrained extends Unconstrained ? 1 : 0>(1);
         <Another>(another: Another) => {
+          // @ts-expect-error
           tyst<Unconstrained extends Another ? 1 : 0>(1);
         };
       };
     }
 
-    // TODO:
+    // Nothing extends unconstrained type including itself.
     {
       <Unconstrained>(unconstrained: Unconstrained) => {
         tyst<any extends Unconstrained ? 1 : 0>(1);
+        // @ts-expect-error
         tyst<unknown extends Unconstrained ? 1 : 0>(1);
+        // @ts-expect-error
         tyst<Everything extends Unconstrained ? 1 : 0>(1);
         tyst<never extends Unconstrained ? 1 : 0>(1);
+        // @ts-expect-error
         tyst<void extends Unconstrained ? 1 : 0>(1);
+        // @ts-expect-error
         tyst<null extends Unconstrained ? 1 : 0>(1);
+        // @ts-expect-error
         tyst<undefined extends Unconstrained ? 1 : 0>(1);
+        // @ts-expect-error
         tyst<Value extends Unconstrained ? 1 : 0>(1);
+        // @ts-expect-error
         tyst<{} extends Unconstrained ? 1 : 0>(1);
+        // @ts-expect-error
         tyst<object extends Unconstrained ? 1 : 0>(1);
+        // @ts-expect-error
+        tyst<Unconstrained extends Unconstrained ? 1 : 0>(1);
         <Another>(another: Another) => {
+          // @ts-expect-error
           tyst<Another extends Unconstrained ? 1 : 0>(1);
         };
       };
