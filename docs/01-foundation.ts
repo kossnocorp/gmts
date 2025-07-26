@@ -3,16 +3,16 @@ import type { Everything, Value } from "../src/basic.ts";
 // | 𝑥 =/extends⁰   | any            | unknown        | Everything¹    | never          | void           | null           | undefined      | Value²         | {}             | object         | Unconstrained³ |
 // | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- | -------------- |
 // | any            | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              |
-// | unknown        | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              |
-// | Everything¹    | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              |
-// | never          | ✘              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              |
-// | void           | ✔              | ✘              | ✘              | ✔              | ✔              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              |
-// | null           | ✔              | ✘              | ✘              | ✔              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              | ✘              |
-// | undefined      | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              |
-// | Value²         | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              |
-// | {}             | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✔              | ✔              | ✔              | ✘              |
-// | object         | ✔              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              | ✔              | ✔              | ✘              |
-// | Unconstrained³ | ✔/✘            | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              |
+// | unknown        | ✔              | ✔              | ✔              | ✔/✘            | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              |
+// | Everything¹    | ✔              | ✔              | ✔              | ✔/✘            | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              | ✔              |
+// | never          | ✘/✔            | ✘/✔            | ✘/✔            | ✔              | ✘/✔            | ✘/✔            | ✘/✔            | ✘/✔            | ✘/✔            | ✘/✔            | ✘/✔            |
+// | void           | ✔              | ✘              | ✘              | ✔/✘            | ✔              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              |
+// | null           | ✔              | ✘              | ✘              | ✔/✘            | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              | ✘              |
+// | undefined      | ✔              | ✘              | ✘              | ✔/✘            | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              | ✘              |
+// | Value²         | ✔              | ✘              | ✘              | ✔/✘            | ✘              | ✘              | ✘              | ✔              | ✘              | ✘              | ✘              |
+// | {}             | ✔              | ✘              | ✘              | ✔/✘            | ✘              | ✘              | ✘              | ✔              | ✔              | ✔              | ✘              |
+// | object         | ✔              | ✘              | ✘              | ✔/✘            | ✘              | ✘              | ✘              | ✘              | ✔              | ✔              | ✘              |
+// | Unconstrained³ | ✔/✘            | ✘              | ✘              | ✔/✘            | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              | ✘              |
 //
 // ⁰ 𝑥/𝑦 used to display inconsistency between assignment and `extends` behavior.
 // ¹ `{} | null | undefined` that mirrors `unknown` behavior.
@@ -245,6 +245,49 @@ let object = {} as object;
       object = never;
       <Unconstrained>(unconstrained: Unconstrained) => {
         unconstrained = never;
+      };
+    }
+
+    // `never` extends everything.
+    {
+      tyst<never extends any ? 1 : 0>(1);
+      tyst<never extends unknown ? 1 : 0>(1);
+      tyst<never extends Everything ? 1 : 0>(1);
+      tyst<never extends never ? 1 : 0>(1);
+      tyst<never extends void ? 1 : 0>(1);
+      tyst<never extends null ? 1 : 0>(1);
+      tyst<never extends undefined ? 1 : 0>(1);
+      tyst<never extends Value ? 1 : 0>(1);
+      tyst<never extends {} ? 1 : 0>(1);
+      tyst<never extends object ? 1 : 0>(1);
+      <Unconstrained>(unconstrained: Unconstrained) => {
+        tyst<never extends Unconstrained ? 1 : 0>(1);
+      };
+    }
+
+    // Only `any` and itself extends `never`.
+    {
+      tyst<any extends never ? 1 : 0>(1);
+      // @ts-expect-error
+      tyst<unknown extends never ? 1 : 0>(1);
+      // @ts-expect-error
+      tyst<Everything extends never ? 1 : 0>(1);
+      tyst<never extends never ? 1 : 0>(1);
+      // @ts-expect-error
+      tyst<void extends never ? 1 : 0>(1);
+      // @ts-expect-error
+      tyst<null extends never ? 1 : 0>(1);
+      // @ts-expect-error
+      tyst<undefined extends never ? 1 : 0>(1);
+      // @ts-expect-error
+      tyst<Value extends never ? 1 : 0>(1);
+      // @ts-expect-error
+      tyst<{} extends never ? 1 : 0>(1);
+      // @ts-expect-error
+      tyst<object extends never ? 1 : 0>(1);
+      <Unconstrained>(unconstrained: Unconstrained) => {
+        // @ts-expect-error
+        tyst<Unconstrained extends never ? 1 : 0>(1);
       };
     }
   }
