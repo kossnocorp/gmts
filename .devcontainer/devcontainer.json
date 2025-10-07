@@ -1,5 +1,5 @@
 {
-  "name": "GM TS",
+  "name": "gmts",
 
   "build": { "dockerfile": "Dockerfile", "context": ".." },
 
